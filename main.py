@@ -124,9 +124,6 @@ def extract_post_id_from_url(url, cookies=None):
     url_patterns = [
         r'/groups/[^/]+/posts/(\d+)',           # /groups/MemeAddiction/posts/4471339869798423
         r'/posts/(\d+)',                         # /posts/123456
-        r'/permalink\.php\?story_fbid=(\d+)',   # permalink.php?story_fbid=123456
-        r'story_fbid=(\d+)',                     # story_fbid=123456
-        r'/p/(\d+)',                             # /p/123456
     ]
     
     for pattern in url_patterns:
