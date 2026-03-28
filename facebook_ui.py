@@ -22,6 +22,7 @@ import post_scraper
 import group_post_scraper_v2
 import single_post_image
 import comment_scraper
+from proxy_utils import select_proxy
 
 
 # Cookie Management
@@ -368,10 +369,35 @@ class ScraperThread(QThread):
     def log(self, message):
         """Emit log message"""
         self.log_signal.emit(message)
-    
+
+    def _apply_proxy(self):
+        """Select the right proxy type and push it to all scraper modules."""
+        has_cookies = bool(self.cookies)
+        proxies = select_proxy(has_cookies)
+
+        # Log to UI
+        if proxies:
+            proxy_url = proxies['http']
+            if has_cookies:
+                import re as _re
+                port = _re.search(r':(\d+)$', proxy_url)
+                port_str = port.group(1) if port else '?'
+                self.log(f"🔒 Proxy: STATIC (cookie session) — port {port_str}")
+            else:
+                self.log(f"🔄 Proxy: ROTATING — {proxy_url}")
+        else:
+            self.log("⚠️  No proxy configured")
+
+        # Push to all scraper modules
+        comment_scraper.PROXIES     = proxies
+        post_scraper.PROXIES        = proxies
+        group_post_scraper_v2.PROXIES = proxies
+        single_post_image.PROXIES   = proxies
+
     def run(self):
         """Run the scraping task"""
         try:
+            self._apply_proxy()
             if self.scraper_type == "simple_post":
                 self.scrape_simple_post()
             elif self.scraper_type == "page_posts":
