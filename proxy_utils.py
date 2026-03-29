@@ -84,7 +84,8 @@ def select_proxy(has_cookies: bool):
     whether a cookie session is active.
 
     has_cookies=True  → static proxy from STATIC_PROXY (country can already be
-                        embedded in username, e.g. __cr.fr), with random port.
+                        embedded in username, e.g. __cr.fr), used as-is first.
+                        Port is changed later only if retry logic rotates proxy.
     has_cookies=False → rotating proxy from ROTATING_PROXY as-is.
 
     Backward compatibility:
@@ -99,10 +100,9 @@ def select_proxy(has_cookies: bool):
             print("⚠️  No STATIC_PROXY configured — requests will be made without a proxy")
             return None
 
-        port = random.randint(STATIC_PORT_MIN, STATIC_PORT_MAX)
-        proxy_url = _replace_trailing_port(static_proxy, port)
+        proxy_url = static_proxy
         print("🔒 Proxy mode : STATIC  (cookie-based session, fixed IP)")
-        print(f"   Port chosen : {port}  (range {STATIC_PORT_MIN}-{STATIC_PORT_MAX})")
+        print("   Initial port: using STATIC_PROXY as configured")
         print(f"   Proxy URL   : {proxy_url}")
         return _build_proxy_dict(proxy_url)
 
