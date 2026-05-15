@@ -1,313 +1,229 @@
-# Facebook Scraper 🕷️
+# Facebook Post Comment Scraper
 
-A powerful Python-based Facebook scraping tool with a PyQt6 GUI interface for extracting posts, comments, and images from Facebook pages, groups, and individual posts without using the official Facebook API.
+Tool Python dùng để crawl bài viết, bình luận, phản hồi bình luận và ảnh từ Facebook bằng HTTP requests/GraphQL, có giao diện PyQt6 để thao tác nhanh.
 
-## 🎯 Key Highlights
+> Dự án phục vụ mục đích học tập, nghiên cứu dữ liệu và sử dụng nội bộ. Người dùng tự chịu trách nhiệm về việc tuân thủ điều khoản của Facebook/Meta và quy định pháp luật liên quan.
 
-- **Pure Requests-Based**: No browser automation or Selenium required - uses direct HTTP requests to Facebook's GraphQL API
-- **Lightweight & Fast**: Minimal dependencies, efficient memory usage, and faster execution
-- **No Browser Intervention**: Operates entirely through HTTP requests without spawning browser instances
-- **Headless Operation**: Perfect for servers and automated workflows
+## Tính năng chính
 
-## ✨ Features
+- Crawl một hoặc nhiều bài viết Facebook.
+- Crawl nhiều bài viết từ Page/Profile.
+- Crawl nhiều bài viết từ Group.
+- Lấy comment, reply comment, số reaction và một số metadata của bài viết.
+- Tải ảnh từ bài viết khi tìm được `media_id`.
+- Hỗ trợ cookie và `fb_dtsg` để dùng session đã đăng nhập.
+- Hỗ trợ proxy qua file `.env`.
+- Xuất dữ liệu gốc dạng JSON.
+- Convert JSON đã crawl sang CSV bằng `export_json_to_csv.py`.
 
-- **Multiple Scraping Modes**:
-  - 📄 Single post scraping (text, images, comments, and replies)
-  - 👤 Page/Profile posts scraping
-  - 👥 Facebook Group posts scraping
-  - 🖼️ High-quality image extraction
-  
-- **Rich Data Extraction**:
-  - Post content (text, reactions, shares)
-  - Comments and nested replies
-  - User information (names, IDs, profile links)
-  - Media content (images with multiple resolution support)
-  - Timestamps and engagement metrics
+## Yêu cầu
 
-- **User-Friendly GUI**:
-  - PyQt6-based desktop interface
-  - Real-time logging and progress tracking
-  - Tabbed interface for different scraping types
-  - Easy configuration and export
+- Python 3.8 trở lên.
+- Cookie Facebook hợp lệ nếu cần crawl nội dung yêu cầu đăng nhập.
+- Kết nối mạng ổn định.
 
-- **Robust Architecture**:
-  - Pure `requests` library implementation (no browser/Selenium)
-  - Automatic retry mechanism with exponential backoff
-  - Proxy support for privacy and rate limiting
-  - Pagination handling for large data sets
-  - JSON export for easy data processing
-  - Direct GraphQL API communication
+## Cài đặt
 
-## 🆕 Latest Enhancements (v2.0)
-
-- **🎯 Enhanced Comment Detection**:
-  - 6 extraction paths for comment counts
-  - Handles deeply nested comment structures
-  - Ensures posts with 49+ comments are correctly detected
-  - Never skips posts due to missing comment count data
-
-- **🔍 Advanced Story Node Discovery**:
-  - Multi-location Story node detection (Group edges, timeline edges, direct nodes)
-  - Handles complex JSON structures from Facebook's varying response formats
-  - Discovers posts that were previously hidden in nested structures
-
-- **📸 Complete Album Scraping**:
-  - Automatically fetches ALL images from posts (up to 50 per post)
-  - Uses media ID iteration to navigate through large albums
-  - No longer limited to first 5 images
-  - Perfect for posts with 10-20+ images
-
-- **♻️ Smart Deduplication**:
-  - Detects already-scraped posts by checking saved JSON files
-  - Skips duplicate posts when resuming interrupted sessions
-  - Saves bandwidth and processing time
-  - Automatic folder structure validation
-
-- **🔄 Intelligent Retry Logic**:
-  - 3-attempt retry for transient Facebook API errors
-  - 2-second delays between retry attempts
-  - Handles empty response arrays gracefully
-  - Prevents infinite loops on persistent failures
-
-- **🎬 Content Filtering**:
-  - Automatic reel and video post detection and skipping
-  - Configurable minimum comment threshold
-  - Focus on high-engagement photo posts only
-
-- **🛡️ Robust Error Handling**:
-  - Safe pagination with proper break conditions
-  - No infinite loops on empty responses
-  - Comprehensive error logging
-  - Graceful degradation on failures
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Python 3.8 or higher
-- Valid Facebook session tokens (extracted from browser - one-time setup)
-- No browser automation tools required (Selenium, Playwright, etc.)
-- Works with pure HTTP requests
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/mohdtalal3/facebook_post_comment_scraper
-cd facebook_post_comment_scraper
-```
-
-2. Install required dependencies (minimal and lightweight):
-```bash
-pip install requests PyQt6 python-dotenv
-```
-
-Note: Only `requests` is needed for scraping - no browser automation libraries required!
-
-3. Create a `.env` file in the project root:
-```env
-# Optional: Add your proxy if needed
-PROXY=http://your-proxy:port
-
-# Optional: Add any other configuration
-```
-
-### Required Dependencies
-
-Create a `requirements.txt` file:
-```txt
-requests>=2.28.0
-PyQt6>=6.4.0
-python-dotenv>=0.20.0
-```
-
-Install with:
 ```bash
 pip install -r requirements.txt
 ```
 
-## 📖 Usage
+Hoặc cài thủ công:
 
-### GUI Mode (Recommended)
-
-Launch the graphical interface:
 ```bash
-python facebook_ui.py
+pip install requests PyQt6 python-dotenv seleniumbase
 ```
 
-The GUI provides three main tabs:
-1. **Simple Post**: Scrape a single post with all its comments and images
-2. **Page Posts**: Extract multiple posts from a Facebook page or profile
-3. **Group Posts**: Scrape posts from Facebook groups
+Tạo file `.env` ở thư mục gốc nếu cần dùng proxy:
 
-### CLI Mode
-
-For advanced users, you can use the command-line interface:
-
-```python
-from main import extract_post_id_from_url, fetch_comments_for_post, save_post_data
-
-# Extract post ID
-post_id = extract_post_id_from_url("https://www.facebook.com/permalink.php?story_fbid=123...")
-
-# Fetch comments
-comments = fetch_comments_for_post(post_id, max_comments=100)
-
-# Save data
-save_post_data(post_id, comments, "output_dir")
-```
-
-## 🔧 Configuration
-
-### Proxy Configuration
-
-Add your proxy to the `.env` file:
 ```env
 PROXY=http://username:password@proxy-server:port
 ```
 
-## 📁 Project Structure
+## Chạy giao diện
 
-```
-facebook-scraper/
-├── main.py                      # Main orchestration and utilities
-├── facebook_ui.py               # PyQt6 GUI interface
-├── post_scraper.py              # Page/Profile post scraper
-├── group_post_scraper_v2.py     # Group post scraper
-├── comment_scraper.py           # Comment and reply scraper
-├── single_post_image.py         # Image extraction module
-├── simple_post/                 # Output directory for posts
-├── page_post/                   # Output directory for page posts
-├── ex/                          # Example outputs
-└── extras/                      # Additional scripts and tools
+```bash
+python facebook_ui.py
 ```
 
-## 📊 Output Format
+Giao diện có 3 tab chính:
 
-Data is saved in JSON format with the following structure:
+1. `Simple Post`: crawl comment/ảnh từ một hoặc nhiều URL bài viết.
+2. `Page Posts`: crawl nhiều bài từ Page/Profile.
+3. `Group Posts`: crawl nhiều bài từ Group.
 
-### Post Data
+Mỗi ô URL hỗ trợ nhiều dòng, mỗi dòng là một URL Facebook. Không dán cURL vào ô URL. Nếu cần dùng cookie/session, bấm `Configure Cookies & FB_DTSG`.
+
+## Lấy cookie và fb_dtsg
+
+Trong giao diện, bấm `Configure Cookies & FB_DTSG`, sau đó chọn một trong hai cách:
+
+- Mở Chrome tự động, đăng nhập Facebook, rồi xác nhận để tool lấy cookie.
+- Dán lệnh `Copy as cURL` từ request GraphQL trong DevTools Network để tool parse cookie và `fb_dtsg`.
+
+Sau khi cấu hình xong, log sẽ hiển thị số cookie và token đã nhận.
+
+## Cấu trúc dữ liệu xuất ra
+
+Mặc định dữ liệu crawl được lưu thành JSON theo cấu trúc:
+
+```text
+simple_post/<post_id>/<post_id>.json
+page_post/<page_name>/<post_id>/<post_id>.json
+group_post/<group_name>/<post_id>/<post_id>.json
+```
+
+Ví dụ một file JSON:
+
 ```json
 {
   "post_id": "123456789",
-  "author": "User Name",
-  "author_id": "100001234567890",
-  "content": "Post text content",
-  "timestamp": "2024-01-01T12:00:00",
-  "reactions": 150,
-  "shares": 25,
-  "images": ["url1.jpg", "url2.jpg"],
-  "comments_count": 45
+  "type": "simple_post",
+  "post_info": {
+    "post_story_id": "...",
+    "media_id": "..."
+  },
+  "comments": [
+    {
+      "text": "Noi dung comment",
+      "reaction_count": "0",
+      "replies": []
+    }
+  ]
 }
 ```
 
-### Comment Data
-```json
-{
-  "comment_id": "987654321",
-  "author": "Commenter Name",
-  "author_id": "100009876543210",
-  "text": "Comment text",
-  "timestamp": "2024-01-01T12:30:00",
-  "replies": [...]
-}
+Ảnh, nếu tải được, sẽ nằm cùng thư mục với file JSON của bài viết.
+
+## Convert JSON sang CSV
+
+Script `export_json_to_csv.py` đọc toàn bộ file `.json` trong thư mục input và tạo 2 file:
+
+- `posts.csv`: thông tin bài viết.
+- `comments.csv`: comment và reply comment.
+
+Lệnh cơ bản:
+
+```bash
+python export_json_to_csv.py --input simple_post --output csv_export/simple_post
 ```
 
-## ⚠️ Important Notes
+Convert dữ liệu Page:
 
-### Legal & Ethical Considerations
-
-- **Terms of Service**: This tool may violate Facebook's Terms of Service. Use at your own risk.
-- **Rate Limiting**: Implement appropriate delays between requests to avoid detection.
-- **Privacy**: Respect user privacy and data protection laws (GDPR, CCPA, etc.).
-- **Personal Use**: This tool is intended for educational and research purposes only.
-
-### Technical Limitations
-
-- **Doc IDs**: Facebook's GraphQL document IDs change frequently. You'll need to update them periodically.
-- **Authentication**: Requires valid Facebook session tokens that expire.
-- **Rate Limits**: Excessive requests may result in temporary blocks or account restrictions.
-- **Private Content**: Cannot access content that requires authentication beyond what's provided.
-
-## 🛠️ Troubleshooting
-
-### Common Issues
-
-**1. "Failed after 5 attempts" error**
-- Check your internet connection
-- Verify proxy settings
-- Update DOC_ID values
-- Ensure session tokens are valid
-
-**2. No data returned**
-- Verify the URL/ID is correct
-- Check if content is publicly accessible
-- Update authentication headers
-
-**3. GUI not launching**
-- Ensure PyQt6 is properly installed: `pip install --upgrade PyQt6`
-- Check Python version compatibility
-
-### Debug Mode
-
-Enable verbose logging by modifying the scripts:
-```python
-import logging
-logging.basicConfig(level=logging.DEBUG)
+```bash
+python export_json_to_csv.py --input page_post --output csv_export/page_post
 ```
 
-## 🤝 Contributing
+Convert dữ liệu Group:
 
-Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
+```bash
+python export_json_to_csv.py --input group_post --output csv_export/group_post
+```
 
-### Development Setup
+Convert riêng một thư mục chiến dịch/từ khóa:
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+```bash
+python export_json_to_csv.py --input "simple_post/mandalorian và grogu" --output "csv_export/mandalorian và grogu"
+```
 
-## 📝 License
+Sau khi chạy xong, kết quả sẽ có dạng:
 
-This project is provided for educational purposes only. Users are responsible for ensuring compliance with Facebook's Terms of Service and applicable laws.
+```text
+csv_export/<ten_thu_muc>/posts.csv
+csv_export/<ten_thu_muc>/comments.csv
+```
 
-## 🙏 Acknowledgments
+Các file CSV được ghi bằng encoding `utf-8-sig`, có thể mở trực tiếp bằng Excel.
 
-- Built with Python and PyQt6
-- Uses pure `requests` library for HTTP communication
-- Direct GraphQL API integration (unofficial)
-- No browser automation required
-- Inspired by the need for lightweight, efficient data research tools
+### Cột trong posts.csv
 
-## 📞 Support
+- `post_id`
+- `feedback_id`
+- `page_name`
+- `text`
+- `permalink`
+- `comment_count`
+- `reaction_count`
+- `share_count`
+- `interaction_count`
+- `media_count`
+- `media_urls`
+- `json_path`
 
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Check existing issues for solutions
-- Review the troubleshooting section
+### Cột trong comments.csv
 
-## ⚡ Roadmap
+- `post_id`
+- `page_name`
+- `comment_level`: `0` là comment gốc, `1` trở lên là reply.
+- `comment_text`
+- `reaction_count`
+- `parent_comment_text`
+- `json_path`
 
-**Completed:**
-- [x] Enhanced comment count detection with 6 extraction paths
-- [x] Advanced Story node discovery in nested structures
-- [x] Complete album scraping (up to 50 images per post)
-- [x] Post deduplication for interrupted sessions
-- [x] Automatic retry logic for transient API errors
-- [x] Robust pagination with proper error handling
-- [x] Reel/video filtering
-- [x] Configurable comment threshold filtering
+## Chạy bằng CLI
 
-**Upcoming:**
-- [ ] Add support for Facebook Stories
-- [ ] Implement video download functionality
-- [ ] Add data export to CSV/Excel
-- [ ] Improve authentication flow
-- [ ] Add scheduling and automation features
-- [ ] Create web-based interface
-- [ ] Add data analysis and visualization tools
+Repo vẫn có CLI trong `main.py`:
 
----
+```bash
+python main.py
+```
 
-**Disclaimer**: This tool is not affiliated with or endorsed by Facebook/Meta. Use responsibly and ethically.
+Sau đó chọn loại crawl trong menu:
+
+```text
+1. Simple Post
+2. Page Posts
+3. Group Posts
+4. Exit
+```
+
+Với nhu cầu sử dụng hằng ngày, nên dùng `facebook_ui.py` vì dễ nhập nhiều URL, cấu hình cookie và theo dõi log hơn.
+
+## Cấu trúc project
+
+```text
+facebook_post_comment_scraper-main/
+├── facebook_ui.py              # Giao diện PyQt6
+├── main.py                     # CLI và hàm lưu dữ liệu
+├── post_scraper.py             # Crawl bài từ Page/Profile
+├── group_post_scraper_v2.py    # Crawl bài từ Group
+├── comment_scraper.py          # Crawl comment/reply
+├── single_post_image.py        # Tải ảnh bài viết
+├── export_json_to_csv.py       # Convert JSON sang CSV
+├── proxy_utils.py              # Chọn proxy
+├── simple_post/                # Dữ liệu Simple Post
+├── page_post/                  # Dữ liệu Page, nếu có
+├── group_post/                 # Dữ liệu Group, nếu có
+└── csv_export/                 # CSV sau khi convert
+```
+
+## Lỗi thường gặp
+
+### GUI không mở
+
+Kiểm tra PyQt6:
+
+```bash
+pip install --upgrade PyQt6
+```
+
+### Không lấy được dữ liệu
+
+- Kiểm tra URL có đúng định dạng Facebook không.
+- Kiểm tra nội dung có public hoặc session có quyền xem không.
+- Cấu hình lại cookie và `fb_dtsg`.
+- Kiểm tra proxy trong `.env`.
+
+### Request lỗi nhiều lần
+
+- Facebook có thể đã đổi GraphQL/doc id.
+- Cookie/session có thể đã hết hạn.
+- Proxy có thể chậm hoặc bị chặn.
+- Nên giảm tốc độ crawl hoặc thử lại sau.
+
+## Lưu ý
+
+- Không crawl dữ liệu riêng tư nếu không có quyền.
+- Không gửi request quá nhanh để tránh bị giới hạn.
+- Không chia sẻ cookie hoặc file `.env`.
+- Tool không liên kết và không được xác nhận bởi Facebook/Meta.
